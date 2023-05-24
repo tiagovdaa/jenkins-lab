@@ -1,0 +1,10 @@
+---
+- name: Jenkins Lab
+  hosts: all
+  become: true
+
+  roles:
+    - role: user
+      vars:
+
+        public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
