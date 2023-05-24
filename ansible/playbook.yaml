@@ -3,8 +3,13 @@
   hosts: all
   become: true
 
+  vars:
+    package_list: 
+      - openjdk-11-jre 
+
   roles:
     - role: user
       vars:
-
         public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    - role: add_packages
