@@ -1,7 +1,26 @@
 ---
+- name: Add Jenkins repository key
+  shell: |
+    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+- name: Add Jenkins repository to sources
+  shell: |
+    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+- name: Update package cache
+  apt:
+    update_cache: yes
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+    autoremove: yes
+
 - name: Install packages
   apt:
     name: "{{ item }}"
     state: present
     update_cache: yes
   loop: "{{ package_list }}"
+

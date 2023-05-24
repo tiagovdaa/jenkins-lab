@@ -1,0 +1,37 @@
+---
+- name: Change Jenkins default port
+  lineinfile:
+    path: /var/lib/jenkins/secrets/initialAdminPassword
+    regex: '^HTTP_PORT='
+    line: 'HTTP_PORT={{ jenkins_port }}'
+  when: jenkins_port is defined
+
+- name: Enable and start Jenkins service
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+
+- name: Get Jenkins IP and Port
+  uri:
+    url: "http://localhost:{{ jenkins_port }}/api/json"
+    return_content: yes
+  register: jenkins_info
+  failed_when: jenkins_info.status != 200
+  changed_when: false
+
+- name: Output Jenkins IP and Port
+  debug:
+    msg: "Jenkins is running at http://{{ ansible_host }}:{{ jenkins_port }}"
+
+- name: Output contents of initialAdminPassword
+  command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: admin_password
+  changed_when: false
+  failed_when: admin_password.rc != 0
+  no_log: true
+
+- name: Display initialAdminPassword
+  debug:
+    msg: "initialAdminPassword: {{ admin_password.stdout }}"
+  when: admin_password.stdout is defined
