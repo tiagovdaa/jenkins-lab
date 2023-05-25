@@ -17,19 +17,19 @@
     url: "http://localhost:{{ jenkins_port }}/api/json"
     return_content: yes
   register: jenkins_info
-  failed_when: jenkins_info.status != 200
+  failed_when: jenkins_info.status not in [200, 403]
   changed_when: false
 
 - name: Output Jenkins IP and Port
   debug:
-    msg: "Jenkins is running at http://{{ ansible_host }}:{{ jenkins_port }}"
+    msg: "Jenkins is running at http://{{ ansible_default_ipv4.address }}:{{ jenkins_port }}"
 
 - name: Output contents of initialAdminPassword
-  command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  command: "head -1 /var/lib/jenkins/secrets/initialAdminPassword"
   register: admin_password
   changed_when: false
   failed_when: admin_password.rc != 0
-  no_log: true
+  no_log: false
 
 - name: Display initialAdminPassword
   debug:
