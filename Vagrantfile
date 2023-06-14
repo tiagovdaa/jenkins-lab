@@ -11,7 +11,9 @@ Vagrant.configure("2") do |config|
 
     config.vm.define HOSTNAME do |vm|
       vm.vm.hostname = HOSTNAME
-      vm.vm.network :private_network, :libvirt__network_name => 'isolated'
+      vm.vm.network :private_network, 
+                    :libvirt__network_name => 'isolated', 
+                    :libvirt__network_autostart => false
       vm.vm.provider :libvirt do |libvirt|
         libvirt.driver = "kvm"
         libvirt.host = HOSTNAME
