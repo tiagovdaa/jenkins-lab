@@ -6,7 +6,7 @@
   vars:
     jenkins_port: 8080
     package_list: 
-      - openjdk-11-jre 
+      - openjdk-*-jre 
       - jenkins
     public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
   

@@ -1,12 +1,9 @@
-IMAGE_NAME = "ubuntu/jammy64"
+IMAGE_NAME = "debian/bookworm64"
 NAME = "jenkins-lab"
 CPU = 2
 MEM = 4096
 HOSTNAME = "jenkins-lab"
-
-VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
-
-$DEFAULT_NETWORK_INTERFACE = `ip route | awk '/^default/ {printf "%s", $5; exit 0}'`
+CONNECTION = 'qemu:///system'
 
 Vagrant.configure("2") do |config|
     config.vm.box = IMAGE_NAME
@@ -14,11 +11,13 @@ Vagrant.configure("2") do |config|
 
     config.vm.define HOSTNAME do |vm|
       vm.vm.hostname = HOSTNAME
-      vm.vm.network "public_network", bridge: $DEFAULT_NETWORK_INTERFACE
-      vm.vm.provider :virtualbox do |vb|
-        vb.name = HOSTNAME
-        vb.cpus = CPU
-        vb.memory = MEM
+      vm.vm.network :private_network, :libvirt__network_name => 'isolated'
+      vm.vm.provider :libvirt do |libvirt|
+        libvirt.driver = "kvm"
+        libvirt.host = HOSTNAME
+        libvirt.uri = CONNECTION
+        libvirt.memory = MEM
+        libvirt.cpus = CPU
       end
 
       vm.vm.provision "ansible" do |ansible|
